@@ -1,64 +1,115 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading;
+using System.Net.NetworkInformation;
+using System.ComponentModel;
+using System.Diagnostics.Contracts;
+using System.Net;
 
 namespace SDMCore
 {
     public class DownloadClass
     {
+        public ContentData myContent = new ContentData();
+
+        public struct ContentData {
+            public string contentName;
+            public byte[] contentData;
+            public long contentSize;
+            public string connectionStatus;
+        }
+
+        // конструктор класса
+        //=============================================
         public DownloadClass()
+        {}
+        //=============================================
+
+        // функция проверки доступности сайта/интренета
+        //=============================================
+        public static string CheckSiteAvaliable(string url)
         {
-            
+            HttpClient client1 = new HttpClient();
+            string statusRequest = "";
+            try {
+                Task<HttpResponseMessage> task1 = client1.GetAsync(url);
+                task1.Wait();
+                statusRequest = task1.Result.StatusCode.ToString();
+            }catch (Exception ex){
+                return ex.Message;
+            }
+            return statusRequest;
         }
+        //=============================================
 
-        public static string SayHi()
+        // функция загрузки с HTTP с указанием URL, PATH(by default=the same dir where run this ultility), RESUME(by default=false), THREAD(by default=1), ADAPTER(by default=not set)
+        //=============================================
+        public ContentData DownloadHttp(string url, bool resume = false, int thread = 1, string adapter = "", bool inetAlreadyChecked = false, string inetConnectionStatus = "")
         {
-            return "Hi Men!";
+            string isAvaliableInet = "";
+            string isAvaliableSite = "";
+
+            isAvaliableInet = (inetAlreadyChecked) ? inetConnectionStatus : CheckSiteAvaliable("http://www.ya.ru");
+            if (isAvaliableInet == "OK") {
+                Uri uri = new Uri(url);
+                isAvaliableSite = CheckSiteAvaliable(((uri.Host.Contains("http://") || (uri.Host.Contains("https://")))? uri.Host : uri.Scheme + "://" + uri.Host));
+            } else {
+                myContent.contentName = null;
+                myContent.contentData = null;
+                myContent.contentSize = 0;
+                myContent.connectionStatus = isAvaliableInet;
+
+                return myContent;
+            }
+
+            if (isAvaliableSite == "OK")
+            {
+                WebClient webClient = new WebClient();
+
+
+                /*HttpClient client = new HttpClient();
+                Task<HttpResponseMessage> task = client.GetAsync(url);
+                task.Wait();
+
+                myContent.contentName = task.Result.Content.Headers.ContentDisposition.FileName;
+                myContent.contentData = task.Result.Content.ReadAsByteArrayAsync().Result;
+                myContent.contentSize = task.Result.Content.Headers.ContentLength.Value;
+                myContent.connectionStatus = isAvaliableSite;*/
+            } else {
+                myContent.contentName = null;
+                myContent.contentData = null;
+                myContent.contentSize = 0;
+                myContent.connectionStatus = isAvaliableSite;
+            }
+
+            return myContent;
         }
+        //=============================================
 
-        public static string ReturnHelp()
-        {
-            string help = "This is Help for SDMCore DLL." + Environment.NewLine +
-                          "You can use next arguments:" + Environment.NewLine +
-                          "\"-h\" or \"-help\" - for display this Help information." + Environment.NewLine +
-                          "\"-v\" or \"-version\" - for display version of SDMUtility" + Environment.NewLine +
-                          "\"-u\" or \"-url\" - for set download link." + Environment.NewLine +
-                          "\"-l\" or \"-login\" - for set login for FTP connection." + Environment.NewLine +
-                          "\"-p\" or \"-password\" - for set password for FTP connection." + Environment.NewLine +
-                          "\"-f\" or \"-folder\" - for set folder where should save content (by default using folder where located SDMUtility)." + Environment.NewLine +
-                          "\"-r\" or \"-resume\" - for set on/off resuming downloading proccess if needed (on=1, off=0, by Default=0)." + Environment.NewLine +
-                          "\"-t\" or \"-thread\" - for set number of thread for downloading (min=1, max=5, by Default=1)." + Environment.NewLine +
-                          "\"-a\" or \"-adapter\" - for set which network adapter should using for downloading." + Environment.NewLine + 
-                          Environment.NewLine + "Example of calling:" + Environment.NewLine +
-                          "...\\SDMConsoleUtilityMac.dll -u:http:\\\\testServer:8080\\1.mp4 -f:\"C:\\tmp\\\" -r:1 -t:3" + Environment.NewLine;
-            
-
-            return help;
-        }
-
-        public string GetHttp() 
-        {
-
-
-            return "http_result";
-        }
-
-        public string GetHttps()
+        // функция загрузки с HTTPS с указанием URL, PATH(by default=the same dir where run this ultility), RESUME(by default=false), THREAD(by default=1), ADAPTER(by default=not set)
+        //=============================================
+        public string DownloadHttps(string url, string path = null, bool resume = false, int thread = 1, string adapter = "")
         {
 
 
             return "https_result";
         }
+        //=============================================
 
-        public string GetFtp()
+        // функция загрузки с FTP с указанием URL, PATH(by default=the same dir where run this ultility), RESUME(by default=false), THREAD(by default=1), ADAPTER(by default=not set)
+        //=============================================
+        public string DownloadFtp()
         {
-
+            
 
             return "ftp_result";
         }
-
-        public static string GetVersion()
-        {
-            return typeof(DownloadClass).GetTypeInfo().Assembly.GetName().Version.ToString();
-        }
+        //=============================================
     }
 }
