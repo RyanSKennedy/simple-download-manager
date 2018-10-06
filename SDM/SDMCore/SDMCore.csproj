@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <!--<ReleaseVersion>0.0.1</ReleaseVersion>-->
-    <ReleaseVersion>0.0.1</ReleaseVersion>
+    <ReleaseVersion>0.0.1</ReleaseVersion>  
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-
-  <ItemGroup>
-    <!--<PackageReference Include="" Version=""/>-->
-  </ItemGroup>
-
 </Project>

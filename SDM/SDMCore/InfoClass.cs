@@ -37,7 +37,7 @@ namespace SDMCore
         //=============================================
         public static string GetHelp()
         {
-            return "This is Help for SDMCore DLL." + Environment.NewLine +
+            return "This is Help for SDMCore." + Environment.NewLine +
                           "You can use next arguments:" + Environment.NewLine +
                           "\"-h\" or \"-help\" - for display this Help information." + Environment.NewLine +
                           "\"-v\" or \"-version\" - for display version of SDMUtility" + Environment.NewLine +
@@ -49,7 +49,7 @@ namespace SDMCore
                           "\"-t\" or \"-thread\" - for set number of thread for downloading (min=1, max=5, by Default=1)." + Environment.NewLine +
                           "\"-a\" or \"-adapter\" - for set which network adapter should using for downloading." + Environment.NewLine +
                           Environment.NewLine + "Example of calling:" + Environment.NewLine +
-                          "...\\SDMConsoleUtilityMac.dll -u:http:\\\\testServer:8080\\1.mp4 -f:\"C:\\tmp\\\" -r:1 -t:3" + Environment.NewLine;
+                          "...\\SDMConsoleUtility.dll -u:http:\\\\testServer:8080\\1.mp4 -f:\"C:\\tmp\\\" -r:1 -t:3" + Environment.NewLine;
         }
         //=============================================
 
