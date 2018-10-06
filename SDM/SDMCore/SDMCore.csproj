@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <!--<ReleaseVersion>0.0.1</ReleaseVersion>-->
     <ReleaseVersion>0.0.1</ReleaseVersion>
   </PropertyGroup>
 
