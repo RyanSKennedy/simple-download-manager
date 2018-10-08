@@ -1,9 +1,10 @@
 ﻿using System;
+using SDMCore;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SDMConsoleUtilityMac
+namespace SDMConsoleUtilityUniverse
 {
     class Program
     {
@@ -13,7 +14,7 @@ namespace SDMConsoleUtilityMac
         public SDMCore.DownloadClass.ContentData myContent = new SDMCore.DownloadClass.ContentData();
 
 
-        public struct Arguments 
+        public struct Arguments
         {
             public string arg;
             public string value;
@@ -35,9 +36,9 @@ namespace SDMConsoleUtilityMac
 
             // проверка массива переданных приложению аргументов на наличие команд для вывода версии или справки, а также на корректность вводимых аргументов
             //=============================================
-            foreach(string el in args) 
+            foreach (string el in args)
             {
-                if (String.IsNullOrEmpty(el)) 
+                if (String.IsNullOrEmpty(el))
                 {
                     break;
                 }
@@ -48,18 +49,26 @@ namespace SDMConsoleUtilityMac
                     argsMass[i].arg = tmpArg[0].Substring(1);
                     argsMass[i].value = tmpArg[1];
                     i++;
-                } else if (el.StartsWith('-') && (el.Substring(1,el.Length-1).StartsWith('h') || el.Contains("help"))) {
+                }
+                else if (el.StartsWith('-') && (el.Substring(1, el.Length - 1).StartsWith('h') || el.Contains("help")))
+                {
                     Console.WriteLine(SDMCore.InfoClass.GetHelp());
                     return;
-                } else if (el.StartsWith('-') && (el.Substring(1, el.Length - 1).StartsWith('v') || el.Contains("version"))){
+                }
+                else if (el.StartsWith('-') && (el.Substring(1, el.Length - 1).StartsWith('v') || el.Contains("version")))
+                {
                     Console.WriteLine("Version SDMCore.dll: " + SDMCore.InfoClass.GetVersion());
                     Console.WriteLine("Version SDMConsoleUtility: " + typeof(Program).GetTypeInfo().Assembly.GetName().Version.ToString());
                     return;
-                } else if (el.StartsWith('-') && (el.Substring(1, el.Length - 1).StartsWith('r') || el.Contains("resume"))) {
+                }
+                else if (el.StartsWith('-') && (el.Substring(1, el.Length - 1).StartsWith('r') || el.Contains("resume")))
+                {
                     argsMass[i].arg = el.Substring(1);
                     argsMass[i].value = el;
                     i++;
-                } else {
+                }
+                else
+                {
                     Console.WriteLine("You using incorrect arguments: " + el + Environment.NewLine);
                     return;
                 }
@@ -68,13 +77,13 @@ namespace SDMConsoleUtilityMac
 
             // проверка массива переданных приложению аргументов и их значений на валидность и заполнение коллекцию ключей и значений
             //=============================================
-            foreach (Arguments el in argsMass) 
+            foreach (Arguments el in argsMass)
             {
                 switch (el.arg)
                 {
                     case "u":
                     case "url":
-                        argsArray.Add("url",el.value);
+                        argsArray.Add("url", el.value);
                         break;
 
                     case "l":
@@ -125,8 +134,9 @@ namespace SDMConsoleUtilityMac
             //=============================================
             bool urlIsExist = false;
             foreach (KeyValuePair<string, string> el in argsArray)
-            { 
-                if (el.Key == "url" && !String.IsNullOrEmpty(el.Value)) {
+            {
+                if (el.Key == "url" && !String.IsNullOrEmpty(el.Value))
+                {
                     urlIsExist = true;
                 }
             }
@@ -140,26 +150,29 @@ namespace SDMConsoleUtilityMac
             {
                 // do something
                 string tmpCheck = SDMCore.DownloadClass.CheckSiteAvaliable("http://www.ya.ru");
-                if (tmpCheck != "OK") {
+                if (tmpCheck != "OK")
+                {
                     Console.WriteLine("Problem with internet connection. Error: " + Environment.NewLine + tmpCheck + Environment.NewLine);
                     return;
                 }
 
                 myClass.myContent = myClass.DownloadHttp(argsArray["url"], false, 1, "", true, tmpCheck);
 
-                if (myClass.myContent.contentData != null && myClass.myContent.connectionStatus == "OK") 
+                if (myClass.myContent.contentData != null && myClass.myContent.connectionStatus == "OK")
                 {
-                    Console.WriteLine("Connection status: " + myClass.myContent.connectionStatus + Environment.NewLine); 
+                    Console.WriteLine("Connection status: " + myClass.myContent.connectionStatus + Environment.NewLine);
                     Console.WriteLine("File name: " + myClass.myContent.contentName + Environment.NewLine);
                     Console.WriteLine("File size: " + myClass.myContent.contentSize + " bytes" + Environment.NewLine);
                     Console.WriteLine("File data: " + myClass.myContent.contentData + Environment.NewLine);
-                } else {
+                }
+                else
+                {
                     Console.WriteLine("Problem with internet connection. Error: " + Environment.NewLine + myClass.myContent.connectionStatus + Environment.NewLine);
                     return;
                 }
-
-
-            } else {
+            }
+            else
+            {
                 Console.WriteLine("You not add url, nothing to download!" + Environment.NewLine);
                 return;
             }
