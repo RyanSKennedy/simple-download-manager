@@ -16,19 +16,25 @@ namespace SDMCore
 {
     public class DownloadClass
     {
-        public ContentData myContent = new ContentData();
+        public static ContentData myContent = new ContentData();
+        private static int prev_ticks = 0;
+        private static Dictionary<string, string> dData = new Dictionary<string, string>();
 
         public struct ContentData {
             public string contentName;
-            public byte[] contentData;
+            public string contentFullName;
+            public string contentPath;
+            public string contentExtention;
             public long contentSize;
             public string connectionStatus;
         }
 
         // конструктор класса
         //=============================================
-        public DownloadClass()
-        {}
+        public DownloadClass(Dictionary<string, string> data)
+        {
+            dData = data;
+        }
         //=============================================
 
         // функция проверки доступности сайта/интренета
@@ -38,7 +44,7 @@ namespace SDMCore
             HttpClient client1 = new HttpClient();
             string statusRequest = "";
             try {
-                Task<HttpResponseMessage> task1 = client1.GetAsync(url);
+                Task<HttpResponseMessage> task1 = client1.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 task1.Wait();
                 statusRequest = task1.Result.StatusCode.ToString();
             }catch (Exception ex){
@@ -61,7 +67,9 @@ namespace SDMCore
                 isAvaliableSite = CheckSiteAvaliable(((uri.Host.Contains("http://") || (uri.Host.Contains("https://")))? uri.Host : uri.Scheme + "://" + uri.Host));
             } else {
                 myContent.contentName = null;
-                myContent.contentData = null;
+                myContent.contentFullName = null;
+                myContent.contentPath = null;
+                myContent.contentExtention = null;
                 myContent.contentSize = 0;
                 myContent.connectionStatus = isAvaliableInet;
 
@@ -70,20 +78,25 @@ namespace SDMCore
 
             if (isAvaliableSite == "OK")
             {
-                WebClient webClient = new WebClient();
+                myContent.connectionStatus = isAvaliableSite;
 
+                // создаём директорию если она не существует
+                //=============================================
+                if (!Directory.Exists(dData["folder"]))
+                {
+                    Directory.CreateDirectory(dData["folder"]);
+                }
+                //=============================================
 
-                /*HttpClient client = new HttpClient();
-                Task<HttpResponseMessage> task = client.GetAsync(url);
-                task.Wait();
-
-                myContent.contentName = task.Result.Content.Headers.ContentDisposition.FileName;
-                myContent.contentData = task.Result.Content.ReadAsByteArrayAsync().Result;
-                myContent.contentSize = task.Result.Content.Headers.ContentLength.Value;
-                myContent.connectionStatus = isAvaliableSite;*/
+                StandartFileDownloaderClass iw = new StandartFileDownloaderClass(dData["url"], dData["folder"] + Path.DirectorySeparatorChar + dData["full_name"]);
+                iw.ProgressChanged += iw_ProgressChanged;
+                iw.FileCompleted += iw_FileCompleted;
+                iw.StartDownload();
             } else {
                 myContent.contentName = null;
-                myContent.contentData = null;
+                myContent.contentFullName = null;
+                myContent.contentPath = null;
+                myContent.contentExtention = null;
                 myContent.contentSize = 0;
                 myContent.connectionStatus = isAvaliableSite;
             }
@@ -109,6 +122,42 @@ namespace SDMCore
             
 
             return "ftp_result";
+        }
+        //=============================================
+
+        // событие по окончании загрузки
+        //=============================================
+        static void iw_FileCompleted(object sender, DownloadFileCompletedArgs e)
+        {
+            myContent.contentFullName = e.FileName;
+            myContent.contentName = dData["name"];
+            myContent.contentPath = dData["folder"];
+            myContent.contentExtention = dData["extension"];
+            myContent.contentSize = e.FileSize;
+
+            Console.WriteLine(Environment.NewLine + "Completed downloading and saving file: " + myContent.contentName + ((myContent.contentExtention!="") ? "." + myContent.contentExtention : "") + "\r\n");
+        }
+        //=============================================
+
+        // событие при изменении состояния загрузки 
+        //=============================================
+        static void iw_ProgressChanged(object sender, DownloadProgressChangedArgs e)
+        {
+            int currect_ticks = Environment.TickCount;
+            if (prev_ticks == 0)
+                prev_ticks = currect_ticks;
+
+            int diff = currect_ticks - prev_ticks;
+            int speed = 0;
+            if (diff != 0)
+            {
+                speed = (int)((float)e.BytesRead / (float)diff * 1000.0 / 1024);
+            }
+
+            prev_ticks = currect_ticks;
+
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write("{0}%... Speed: {1} KBytes/sec", e.ProgressPercentage, speed);
         }
         //=============================================
     }
