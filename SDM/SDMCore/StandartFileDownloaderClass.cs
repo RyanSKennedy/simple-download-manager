@@ -131,7 +131,26 @@ namespace SDMCore
             return size;
         }
 
-        public void StartDownload()
+        public static string GetContentName (string url) 
+        {
+            string contentNameStr = null;
+
+            HttpClient client = new HttpClient();
+            try
+            {
+                var task = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                task.Wait();
+                contentNameStr = task.Result.RequestMessage.RequestUri.Segments[task.Result.RequestMessage.RequestUri.Segments.Length - 1].ToString();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return contentNameStr;
+        }
+
+        public void StartDownload(bool needAddName = false)
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
             using (HttpWebResponse result = (HttpWebResponse)request.GetResponse())
@@ -139,6 +158,10 @@ namespace SDMCore
                 length = result.ContentLength;
                 filesize = result.ContentLength;
                 result.Close();
+            }
+
+            if (needAddName == true) {
+                filename += GetContentName(url);
             }
 
             using (FileStream fs = new FileStream(filename, FileMode.Append))

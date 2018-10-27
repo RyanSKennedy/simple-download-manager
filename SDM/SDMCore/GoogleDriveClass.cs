@@ -19,5 +19,12 @@ namespace SDMCore
         public GoogleDriveClass()
         {
         }
+
+        public static string GetInfo() 
+        {
+            var response = HttpRequestClass.GetRequest("");
+
+            return response;
+        }
     }
 }

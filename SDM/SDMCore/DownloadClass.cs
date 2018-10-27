@@ -11,6 +11,8 @@ using System.Net.NetworkInformation;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SDMCore
 {
@@ -88,11 +90,37 @@ namespace SDMCore
                 }
                 //=============================================
 
-                StandartFileDownloaderClass iw = new StandartFileDownloaderClass(dData["url"], dData["folder"] + Path.DirectorySeparatorChar + dData["full_name"]);
-                iw.ProgressChanged += iw_ProgressChanged;
-                iw.FileCompleted += iw_FileCompleted;
-                iw.StartDownload();
-            } else {
+                if (dData["url"].Contains("yadi.sk")) {
+                    // загрузка с обычного http пример: -url:"https://yadi.sk/d/9kwNhX7T3aEwB7"
+                    //=============================================
+                    JObject tmpResult = (JObject)JsonConvert.DeserializeObject(YaDiskClass.GetInfo(dData["url"]));
+
+                    myContent.contentName = tmpResult["name"].ToString();
+                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + tmpResult["name"].ToString();
+                    myContent.contentPath = dData["folder"];
+                    myContent.contentExtention = (tmpResult["name"].ToString().Contains(".") ? tmpResult["name"].ToString().Split(".")[tmpResult["name"].ToString().Split(".").Length - 1] : "");
+                    myContent.contentSize = (long)Convert.ToInt32(tmpResult["size"].ToString());
+
+                    var urlForDownload = YaDiskClass.GetData(dData["url"]);
+                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(urlForDownload, myContent.contentFullName);
+                    iw.ProgressChanged += iw_ProgressChanged;
+                    iw.FileCompleted += iw_FileCompleted;
+                    iw.StartDownload();
+                    //=============================================
+                }
+                else if (dData["url"].Contains("drive.google.com")) {
+
+                } else {
+                    // загрузка с обычного http пример: -url:"http://safenet-sentinel.ru/files/sentinel_ldk_run-time_gui.zip"
+                    //=============================================
+                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(dData["url"], dData["folder"] + Path.DirectorySeparatorChar);
+                    iw.ProgressChanged += iw_ProgressChanged;
+                    iw.FileCompleted += iw_FileCompleted;
+                    iw.StartDownload(true);
+                    //=============================================
+                }
+            }
+            else {
                 myContent.contentName = null;
                 myContent.contentFullName = null;
                 myContent.contentPath = null;
@@ -129,13 +157,16 @@ namespace SDMCore
         //=============================================
         static void iw_FileCompleted(object sender, DownloadFileCompletedArgs e)
         {
-            myContent.contentFullName = e.FileName;
-            myContent.contentName = dData["name"];
-            myContent.contentPath = dData["folder"];
-            myContent.contentExtention = dData["extension"];
-            myContent.contentSize = e.FileSize;
+            if (myContent.contentFullName == null)
+            {
+                myContent.contentFullName = e.FileName;
+                myContent.contentName = e.FileName.Split(Path.DirectorySeparatorChar.ToString())[e.FileName.Split(Path.DirectorySeparatorChar.ToString()).Length - 1]; //dData["name"] + (String.IsNullOrEmpty(dData["extension"]) ? "" : "." + dData["extension"]);
+                myContent.contentPath = dData["folder"];
+                myContent.contentExtention = myContent.contentName.Split(".")[myContent.contentName.Split(".").Length - 1];
+                myContent.contentSize = e.FileSize;
+            }
 
-            Console.WriteLine(Environment.NewLine + "Completed downloading and saving file: " + myContent.contentName + ((myContent.contentExtention!="") ? "." + myContent.contentExtention : "") + "\r\n");
+            Console.WriteLine(Environment.NewLine + "Completed downloading and saving file: \"" + myContent.contentName + "\"\r\n");
         }
         //=============================================
 

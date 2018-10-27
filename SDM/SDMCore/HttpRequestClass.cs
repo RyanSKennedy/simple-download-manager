@@ -13,11 +13,11 @@ namespace SDMCore
         {
         }
 
-        public static HttpResponseMessage GetRequest (string requestUrl) 
+        public static string GetRequest (string requestUrl) 
         {
             HttpClient request = new HttpClient();
-            HttpResponseMessage response = null;
-            response = request.GetAsync(requestUrl).Result;
+            string response = null;
+            response = request.GetStringAsync(requestUrl).Result;
 
             return response;
         }
