@@ -26,7 +26,7 @@ namespace SDMCore
             public string contentName;
             public string contentFullName;
             public string contentPath;
-            public string contentExtention;
+            public string contentExtension;
             public long contentSize;
             public string connectionStatus;
         }
@@ -71,7 +71,7 @@ namespace SDMCore
                 myContent.contentName = null;
                 myContent.contentFullName = null;
                 myContent.contentPath = null;
-                myContent.contentExtention = null;
+                myContent.contentExtension = null;
                 myContent.contentSize = 0;
                 myContent.connectionStatus = isAvaliableInet;
 
@@ -91,17 +91,34 @@ namespace SDMCore
                 //=============================================
 
                 if (dData["url"].Contains("yadi.sk")) {
-                    // загрузка с обычного http пример: -url:"https://yadi.sk/d/9kwNhX7T3aEwB7"
+                    // загрузка с yadi.sk пример: -url:"https://yadi.sk/d/9kwNhX7T3aEwB7"
                     //=============================================
-                    JObject tmpResult = (JObject)JsonConvert.DeserializeObject(YaDiskClass.GetInfo(dData["url"]));
+                    JObject tmpResult = null;
+                    string getDataFromUrl = YaDiskClass.GetInfo(dData["url"]);
+                    tmpResult = (!String.IsNullOrEmpty(getDataFromUrl) ? (JObject)JsonConvert.DeserializeObject(getDataFromUrl) : null);
 
-                    myContent.contentName = tmpResult["name"].ToString();
-                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + tmpResult["name"].ToString();
+                    if (String.IsNullOrEmpty(dData["full_name"])) {
+                        if (tmpResult == null) {
+                            string tmpAutoName = SDMCore.InfoClass.GetNewFileName();
+
+                            dData["full_name"] = tmpAutoName;
+                            dData["name"] = tmpAutoName;
+                            dData["extension"] = "";
+                        } else {
+                            dData["full_name"] = tmpResult["name"].ToString();
+                            dData["name"] = (tmpResult["name"].ToString().Contains(".") ? tmpResult["name"].ToString().Substring(0, tmpResult["name"].ToString().LastIndexOf('.')) : tmpResult["name"].ToString());
+                            dData["extension"] = (tmpResult["name"].ToString().Contains(".") ? tmpResult["name"].ToString().Substring(tmpResult["name"].ToString().LastIndexOf('.') + 1, tmpResult["name"].ToString().Length - 1 - tmpResult["name"].ToString().LastIndexOf('.')) : "");
+                        }
+                    }
+
+                    myContent.contentName = dData["full_name"];
+                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + dData["full_name"];
                     myContent.contentPath = dData["folder"];
-                    myContent.contentExtention = (tmpResult["name"].ToString().Contains(".") ? tmpResult["name"].ToString().Split(".")[tmpResult["name"].ToString().Split(".").Length - 1] : "");
-                    myContent.contentSize = (long)Convert.ToInt32(tmpResult["size"].ToString());
+                    myContent.contentExtension = dData["extension"];
+                    myContent.contentSize = (tmpResult == null ? 0 : (long)Convert.ToInt32(tmpResult["size"].ToString()));
 
                     var urlForDownload = YaDiskClass.GetData(dData["url"]);
+
                     StandartFileDownloaderClass iw = new StandartFileDownloaderClass(urlForDownload, myContent.contentFullName);
                     iw.ProgressChanged += iw_ProgressChanged;
                     iw.FileCompleted += iw_FileCompleted;
@@ -109,14 +126,39 @@ namespace SDMCore
                     //=============================================
                 }
                 else if (dData["url"].Contains("drive.google.com")) {
+                    // загрузка с drive.google.com пример: -url:"https://drive.google.com/open?id=16m1ptk2N9iV4nzCW9FMjZArdxe8J3KG6"
+                    //=============================================
 
-                } else {
+                    //=============================================
+                }
+                else {
                     // загрузка с обычного http пример: -url:"http://safenet-sentinel.ru/files/sentinel_ldk_run-time_gui.zip"
                     //=============================================
-                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(dData["url"], dData["folder"] + Path.DirectorySeparatorChar);
+                    if (String.IsNullOrEmpty(dData["full_name"])) {
+                        string tmpNameFromUrl = StandartFileDownloaderClass.GetContentName(url);
+                        if (String.IsNullOrEmpty(tmpNameFromUrl)) {
+                            string tmpAutoName = SDMCore.InfoClass.GetNewFileName();
+
+                            dData["full_name"] = tmpAutoName;
+                            dData["name"] = tmpAutoName;
+                            dData["extension"] = "";
+                        } else {
+                            dData["full_name"] = tmpNameFromUrl;
+                            dData["name"] = (tmpNameFromUrl.Contains(".") ? tmpNameFromUrl.Substring(0, tmpNameFromUrl.LastIndexOf('.')) : tmpNameFromUrl);
+                            dData["extension"] = (tmpNameFromUrl.Contains(".") ? tmpNameFromUrl.Substring(tmpNameFromUrl.LastIndexOf('.') + 1, tmpNameFromUrl.Length - 1 - tmpNameFromUrl.LastIndexOf('.')) : "");
+                        }
+                    }
+
+                    myContent.contentName = dData["full_name"];
+                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + dData["full_name"];
+                    myContent.contentPath = dData["folder"];
+                    myContent.contentExtension = dData["extension"];
+                    myContent.contentSize = StandartFileDownloaderClass.GetContentSize(url);
+
+                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(dData["url"], myContent.contentFullName);
                     iw.ProgressChanged += iw_ProgressChanged;
                     iw.FileCompleted += iw_FileCompleted;
-                    iw.StartDownload(true);
+                    iw.StartDownload();
                     //=============================================
                 }
             }
@@ -124,7 +166,7 @@ namespace SDMCore
                 myContent.contentName = null;
                 myContent.contentFullName = null;
                 myContent.contentPath = null;
-                myContent.contentExtention = null;
+                myContent.contentExtension = null;
                 myContent.contentSize = 0;
                 myContent.connectionStatus = isAvaliableSite;
             }
@@ -157,15 +199,6 @@ namespace SDMCore
         //=============================================
         static void iw_FileCompleted(object sender, DownloadFileCompletedArgs e)
         {
-            if (myContent.contentFullName == null)
-            {
-                myContent.contentFullName = e.FileName;
-                myContent.contentName = e.FileName.Split(Path.DirectorySeparatorChar.ToString())[e.FileName.Split(Path.DirectorySeparatorChar.ToString()).Length - 1]; //dData["name"] + (String.IsNullOrEmpty(dData["extension"]) ? "" : "." + dData["extension"]);
-                myContent.contentPath = dData["folder"];
-                myContent.contentExtention = myContent.contentName.Split(".")[myContent.contentName.Split(".").Length - 1];
-                myContent.contentSize = e.FileSize;
-            }
-
             Console.WriteLine(Environment.NewLine + "Completed downloading and saving file: \"" + myContent.contentName + "\"\r\n");
         }
         //=============================================

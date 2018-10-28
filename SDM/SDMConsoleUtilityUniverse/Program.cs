@@ -109,8 +109,8 @@ namespace SDMConsoleUtilityUniverse
                         argsArray.Add("name", el.value);
                         dData.Add("full_name", el.value);
                         if (el.value.Split('.').Length > 1) {
-                            dData.Add("name", el.value.Split('.')[0]);
-                            dData.Add("extension", el.value.Split('.')[1]);
+                            dData.Add("name", el.value.Substring(0, el.value.LastIndexOf('.')));
+                            dData.Add("extension", el.value.Substring(el.value.LastIndexOf('.') + 1, el.value.Length - 1 - el.value.LastIndexOf('.')));
                         } else {
                             dData.Add("name", el.value);
                             dData.Add("extension", "");
@@ -167,10 +167,8 @@ namespace SDMConsoleUtilityUniverse
             // задаём имя по умолчанию (если через параметры ничего не передали)
             //=============================================
             if (fileNameIsExist == false) {
-                string tmpName = SDMCore.InfoClass.GetNewFileName();
-                argsArray.Add("name", tmpName);
-                dData.Add("full_name", tmpName);
-                dData.Add("name", tmpName);
+                dData.Add("full_name", "");
+                dData.Add("name", "");
                 dData.Add("extension", "");
             }
             //=============================================

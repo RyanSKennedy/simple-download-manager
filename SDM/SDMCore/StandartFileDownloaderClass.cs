@@ -150,7 +150,7 @@ namespace SDMCore
             return contentNameStr;
         }
 
-        public void StartDownload(bool needAddName = false)
+        public void StartDownload()
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
             using (HttpWebResponse result = (HttpWebResponse)request.GetResponse())
@@ -158,10 +158,6 @@ namespace SDMCore
                 length = result.ContentLength;
                 filesize = result.ContentLength;
                 result.Close();
-            }
-
-            if (needAddName == true) {
-                filename += GetContentName(url);
             }
 
             using (FileStream fs = new FileStream(filename, FileMode.Append))
