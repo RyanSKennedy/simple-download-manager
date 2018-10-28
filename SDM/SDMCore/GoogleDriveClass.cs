@@ -16,15 +16,31 @@ namespace SDMCore
 {
     public class GoogleDriveClass
     {
+        private static string getInfoPreLink = "";
+        private static string getDataPreLink = "";
+
         public GoogleDriveClass()
         {
         }
 
-        public static string GetInfo() 
+        public static string GetInfo(string url) 
         {
-            var response = HttpRequestClass.GetRequest("");
+            return HttpRequestClass.GetRequest(getInfoPreLink + ConvertUrl(url));
+        }
 
-            return response;
+        public static string GetData(string url)
+        {
+
+
+            return null;
+        }
+
+        private static string ConvertUrl(string url)
+        {
+            url = url.Replace(":", "%3A");
+            url = url.Replace("/", "%2F");
+
+            return url;
         }
     }
 }
