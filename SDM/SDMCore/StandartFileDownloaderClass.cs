@@ -150,9 +150,14 @@ namespace SDMCore
             return contentNameStr;
         }
 
-        public void StartDownload()
+        public void StartDownload(Dictionary<string, string> cookie = null)
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            if (cookie != null) {
+                foreach (var pair in cookie) {
+                    request.Headers.Set(pair.Key, pair.Value);
+                }
+            }
             using (HttpWebResponse result = (HttpWebResponse)request.GetResponse())
             {
                 length = result.ContentLength;

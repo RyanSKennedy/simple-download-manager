@@ -19,8 +19,10 @@ namespace SDMCore
     public class DownloadClass
     {
         public static ContentData myContent = new ContentData();
+        public static DataForDownloadingFromGoogleDrive myGoogleDrive = new DataForDownloadingFromGoogleDrive();
         private static int prev_ticks = 0;
         private static Dictionary<string, string> dData = new Dictionary<string, string>();
+
 
         public struct ContentData {
             public string contentName;
@@ -29,6 +31,11 @@ namespace SDMCore
             public string contentExtension;
             public long contentSize;
             public string connectionStatus;
+        }
+
+        public struct DataForDownloadingFromGoogleDrive {
+            public string url;
+            public Dictionary<string, string> cookies;
         }
 
         // конструктор класса
@@ -117,7 +124,7 @@ namespace SDMCore
                     myContent.contentExtension = dData["extension"];
                     myContent.contentSize = (tmpResult == null ? 0 : (long)Convert.ToInt32(tmpResult["size"].ToString()));
 
-                    var urlForDownload = YaDiskClass.GetData(dData["url"]);
+                    var urlForDownload = YaDiskClass.GetUrlForDownloadingData(dData["url"]);
 
                     StandartFileDownloaderClass iw = new StandartFileDownloaderClass(urlForDownload, myContent.contentFullName);
                     iw.ProgressChanged += iw_ProgressChanged;
@@ -128,7 +135,19 @@ namespace SDMCore
                 else if (dData["url"].Contains("drive.google.com")) {
                     // загрузка с drive.google.com пример: -url:"https://drive.google.com/open?id=16m1ptk2N9iV4nzCW9FMjZArdxe8J3KG6"
                     //=============================================
+                    //var id = GoogleDriveClass.GetFileIdFromUrl(dData["url"]);
+                    var urlForDownload = GoogleDriveClass.GetUrlForDownloadingData(dData["url"]);
 
+                    myContent.contentName = "test"; // dData["full_name"];
+                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + "test"; // dData["full_name"];
+                    myContent.contentPath = dData["folder"];
+                    myContent.contentExtension = dData["extension"];
+                    myContent.contentSize = 0;
+
+                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(urlForDownload.url, myContent.contentFullName);
+                    iw.ProgressChanged += iw_ProgressChanged;
+                    iw.FileCompleted += iw_FileCompleted;
+                    iw.StartDownload(urlForDownload.cookies);
                     //=============================================
                 }
                 else {

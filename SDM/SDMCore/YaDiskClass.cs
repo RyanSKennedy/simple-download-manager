@@ -30,7 +30,7 @@ namespace SDMCore
             return HttpRequestClass.GetRequest(getInfoPreLink + ConvertUrl(url));
         }
 
-        public static string GetData(string url) 
+        public static string GetUrlForDownloadingData(string url) 
         {
             JObject tmpResult = (JObject)JsonConvert.DeserializeObject(HttpRequestClass.GetRequest(getDataPreLink + ConvertUrl(url)));
             string urlForDownload = null;
