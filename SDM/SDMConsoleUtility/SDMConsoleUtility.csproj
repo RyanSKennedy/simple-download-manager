@@ -4,6 +4,12 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ReleaseVersion>0.0.1</ReleaseVersion>
+    <RepositoryUrl>https://github.com/RyanSKennedy/simple-download-manager</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <Copyright>RSK</Copyright>
+    <Description>Console cross platform utility for downloading files with resuming.</Description>
+    <Authors>Ryan Scott Kennedy</Authors>
+    <Company>RSK inc.</Company>
   </PropertyGroup>
 
   <ItemGroup>
