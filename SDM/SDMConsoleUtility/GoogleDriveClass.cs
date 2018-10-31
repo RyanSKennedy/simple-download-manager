@@ -103,8 +103,6 @@ namespace SDMCore
     public class GoogleDriveClass
     {
         private static string fileIdFromUrl = null;
-        private static string getInfoPreLink = null;
-        private static string getDataPreLink = null;
         private const string domainPartFromUrl = "https://drive.google.com/";
 
 
@@ -147,10 +145,11 @@ namespace SDMCore
                     {
                         urlForDownload.url = UrlBuilder(GetFileIdFromUrl(url), c.Value, true);
                         urlForDownload.cookies = new Dictionary<string, string>();
-                        urlForDownload.cookies.Add("Name", c.Name);
-                        urlForDownload.cookies.Add("Value", c.Value);
-                        urlForDownload.cookies.Add("Domain", c.Domain);
-                        urlForDownload.cookies.Add("Path", c.Path);
+                        urlForDownload.cookies.Add(c.Name, c.Value);
+                        //urlForDownload.cookies.Add("Name", c.Name);
+                        //urlForDownload.cookies.Add("Value", c.Value);
+                        //urlForDownload.cookies.Add("Domain", c.Domain);
+                        //urlForDownload.cookies.Add("Path", c.Path);
                     }
                 }
 
