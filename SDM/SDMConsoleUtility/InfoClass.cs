@@ -37,15 +37,15 @@ namespace SDMCore
         //=============================================
         public static string GetHelp()
         {
-            return "This is Help for SDMCore." + Environment.NewLine +
+            return "This is Help for SDM Console Utility." + Environment.NewLine +
                           "You can use next arguments:" + Environment.NewLine +
                           "\"-h\" or \"-help\" - for display this Help information." + Environment.NewLine +
-                          "\"-v\" or \"-version\" - for display version of SDMUtility" + Environment.NewLine +
+                          "\"-v\" or \"-version\" - for display version of SDMConsoleUtility" + Environment.NewLine +
                           "\"-r\" or \"-resume\" - for switch ON resuming downloading proccess." + Environment.NewLine +
                           "\"-u\" or \"-url\" - for set download link." + Environment.NewLine +
                           "\"-l\" or \"-login\" - for set login for FTP connection." + Environment.NewLine +
                           "\"-p\" or \"-password\" - for set password for FTP connection." + Environment.NewLine +
-                          "\"-f\" or \"-folder\" - for set folder where should save content (by default using folder where located SDMUtility)." + Environment.NewLine +
+                          "\"-f\" or \"-folder\" - for set folder where should save content (by default using folder where located SDMConsoleUtility)." + Environment.NewLine +
                           "\"-n\" or \"-name\" - for set full name with or without extension(by default name is: \"file_dd_MM_yyyy-HH_mm_ss\")." + Environment.NewLine +
                           "\"-t\" or \"-thread\" - for set number of thread for downloading (min=1, max=5, by Default=1)." + Environment.NewLine +
                           "\"-a\" or \"-adapter\" - for set which network adapter should using for downloading." + Environment.NewLine +

@@ -58,7 +58,6 @@ namespace SDMConsoleUtility
                 }
                 else if (el.StartsWith('-') && (el.Substring(1, el.Length - 1).StartsWith('v') || el.Contains("version")))
                 {
-                    Console.WriteLine("Version SDMCore.dll: " + SDMCore.InfoClass.GetVersion());
                     Console.WriteLine("Version SDMConsoleUtility: " + typeof(Program).GetTypeInfo().Assembly.GetName().Version.ToString());
                     return;
                 }

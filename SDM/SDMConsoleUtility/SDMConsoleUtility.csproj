@@ -10,6 +10,7 @@
     <Description>Console cross platform utility for downloading files with resuming.</Description>
     <Authors>Ryan Scott Kennedy</Authors>
     <Company>RSK inc.</Company>
+    <Version>1.0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
