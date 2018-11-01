@@ -150,14 +150,16 @@ namespace SDMCore
             return contentNameStr;
         }
 
-        public void StartDownload(Dictionary<string, string> cookie = null)
+        public void StartDownload(HttpClient httpClient = null)
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
-            if (cookie != null) {
-                foreach (var pair in cookie) {
-                    request.Headers.Set(pair.Key, pair.Value);
-                }
+
+            if (httpClient != null) {
+                // загрузка через HttpClient
+                // в теории пока
+                return;
             }
+
             using (HttpWebResponse result = (HttpWebResponse)request.GetResponse())
             {
                 length = result.ContentLength;

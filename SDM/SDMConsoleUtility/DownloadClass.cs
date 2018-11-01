@@ -35,7 +35,8 @@ namespace SDMCore
 
         public struct DataForDownloadingFromGoogleDrive {
             public string url;
-            public Dictionary<string, string> cookies;
+            public HttpClient httpClient;
+            //public Dictionary<string, string> cookies;
         }
 
         // конструктор класса
@@ -138,16 +139,40 @@ namespace SDMCore
                     //var id = GoogleDriveClass.GetFileIdFromUrl(dData["url"]);
                     var urlForDownload = GoogleDriveClass.GetUrlForDownloadingData(dData["url"]);
 
-                    myContent.contentName = "test"; // dData["full_name"];
-                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + "test"; // dData["full_name"];
+                    // test block
+                    var tmpResponse = GoogleDriveClass.GetInfo(urlForDownload.url, urlForDownload.httpClient);
+                    string tmpFileName = tmpResponse.Content.Headers.ContentDisposition.FileNameStar;
+                    string tmpUrl = tmpResponse.RequestMessage.RequestUri.AbsoluteUri;
+                    //
+
+                    if (String.IsNullOrEmpty(dData["full_name"]))
+                    {
+                        if (tmpFileName == null)
+                        {
+                            string tmpAutoName = SDMCore.InfoClass.GetNewFileName();
+
+                            dData["full_name"] = tmpAutoName;
+                            dData["name"] = tmpAutoName;
+                            dData["extension"] = "";
+                        }
+                        else
+                        {
+                            dData["full_name"] = tmpFileName;
+                            dData["name"] = (tmpFileName.Contains(".") ? tmpFileName.Substring(0, tmpFileName.LastIndexOf('.')) : tmpFileName);
+                            dData["extension"] = (tmpFileName.Contains(".") ? tmpFileName.Substring(tmpFileName.LastIndexOf('.') + 1, tmpFileName.Length - 1 - tmpFileName.LastIndexOf('.')) : "");
+                        }
+                    }
+
+                    myContent.contentName = dData["full_name"];
+                    myContent.contentFullName = dData["folder"] + Path.DirectorySeparatorChar + dData["full_name"];
                     myContent.contentPath = dData["folder"];
                     myContent.contentExtension = dData["extension"];
                     myContent.contentSize = 0;
 
-                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(urlForDownload.url, myContent.contentFullName);
+                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(tmpUrl, myContent.contentFullName);
                     iw.ProgressChanged += iw_ProgressChanged;
                     iw.FileCompleted += iw_FileCompleted;
-                    iw.StartDownload(urlForDownload.cookies);
+                    iw.StartDownload(urlForDownload.httpClient);
                     //=============================================
                 }
                 else {
@@ -191,16 +216,6 @@ namespace SDMCore
             }
 
             return myContent;
-        }
-        //=============================================
-
-        // функция загрузки с HTTPS с указанием URL, PATH(by default=the same dir where run this ultility), RESUME(by default=false), THREAD(by default=1), ADAPTER(by default=not set)
-        //=============================================
-        public string DownloadHttps(string url, string path = null, bool resume = false, int thread = 1, string adapter = "")
-        {
-
-
-            return "https_result";
         }
         //=============================================
 

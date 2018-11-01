@@ -105,24 +105,21 @@ namespace SDMCore
         private static string fileIdFromUrl = null;
         private const string domainPartFromUrl = "https://drive.google.com/";
 
-
         public GoogleDriveClass(string url = null)
         {
             if (url != null) fileIdFromUrl = GetFileIdFromUrl(url);
         }
 
-        public static string GetInfo(string url) 
+        public static HttpResponseMessage GetInfo(string url, HttpClient httpClient) 
         {
-
-
-            return null;
+            return HttpRequestClass.GetRequest(url, httpClient);
         }
 
         public static DownloadClass.DataForDownloadingFromGoogleDrive GetUrlForDownloadingData(string url)
         {
             DownloadClass.DataForDownloadingFromGoogleDrive urlForDownload;
             urlForDownload.url = null;
-            urlForDownload.cookies = null;
+            urlForDownload.httpClient = null;
 
             Uri uri = new Uri(url);
             HttpClientHandler handler = new HttpClientHandler();
@@ -134,8 +131,6 @@ namespace SDMCore
             task.Wait();
             CookieCollection collection = handler.CookieContainer.GetCookies(uri); // читаем куку из ответа
 
-            //string tmpStr = "Stop" + " working!"; // строка для точки останова
-
             if (task.Result.RequestMessage.RequestUri.AbsoluteUri.Contains("/view")) {
                 urlForDownload = GetUrlForDownloadingData(UrlBuilder(GetFileIdFromUrl(url), null, false, true));
             } else {
@@ -144,8 +139,8 @@ namespace SDMCore
                     if (c.Name.StartsWith("download_warning") && c.Name.Contains(GetFileIdFromUrl(url)) && !String.IsNullOrEmpty(c.Value))
                     {
                         urlForDownload.url = UrlBuilder(GetFileIdFromUrl(url), c.Value, true);
-                        urlForDownload.cookies = new Dictionary<string, string>();
-                        urlForDownload.cookies.Add(c.Name, c.Value);
+                        urlForDownload.httpClient = new HttpClient();
+                        urlForDownload.httpClient = httpClient;
                         //urlForDownload.cookies.Add("Name", c.Name);
                         //urlForDownload.cookies.Add("Value", c.Value);
                         //urlForDownload.cookies.Add("Domain", c.Domain);

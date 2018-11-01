@@ -15,11 +15,20 @@ namespace SDMCore
 
         public static string GetRequest (string requestUrl) 
         {
-            HttpClient request = new HttpClient();
             string response = null;
-            response = request.GetStringAsync(requestUrl).Result;
 
+            HttpClient request = new HttpClient();
+            response = request.GetStringAsync(requestUrl).Result;
+                        
             return response;
+        }
+
+        public static HttpResponseMessage GetRequest(string requestUrl, HttpClient httpClient = null)
+        {
+            var response = httpClient.GetAsync(requestUrl, HttpCompletionOption.ResponseHeadersRead);
+            response.Wait();
+
+            return response.Result;
         }
     }
 }
