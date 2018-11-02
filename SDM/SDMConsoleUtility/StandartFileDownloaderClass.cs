@@ -155,8 +155,20 @@ namespace SDMCore
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
 
             if (httpClient != null) {
-                // загрузка через HttpClient
-                // в теории пока
+                // загрузка через HttpClient и сразу сохраняем
+                try {
+                    var stream = httpClient.GetStreamAsync(url);
+                    var result = stream.Result;
+                    using (var fileStream = System.IO.File.Create(filename))
+                    {
+                        result.CopyTo(fileStream);
+                    }
+
+                    OnDownloadComplete();
+                } catch (Exception e) {
+                    OnFileError(e);
+                }
+
                 return;
             }
 

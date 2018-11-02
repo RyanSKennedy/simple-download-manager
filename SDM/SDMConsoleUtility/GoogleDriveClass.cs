@@ -141,10 +141,6 @@ namespace SDMCore
                         urlForDownload.url = UrlBuilder(GetFileIdFromUrl(url), c.Value, true);
                         urlForDownload.httpClient = new HttpClient();
                         urlForDownload.httpClient = httpClient;
-                        //urlForDownload.cookies.Add("Name", c.Name);
-                        //urlForDownload.cookies.Add("Value", c.Value);
-                        //urlForDownload.cookies.Add("Domain", c.Domain);
-                        //urlForDownload.cookies.Add("Path", c.Path);
                     }
                 }
 

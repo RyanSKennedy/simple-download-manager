@@ -136,13 +136,11 @@ namespace SDMCore
                 else if (dData["url"].Contains("drive.google.com")) {
                     // загрузка с drive.google.com пример: -url:"https://drive.google.com/open?id=16m1ptk2N9iV4nzCW9FMjZArdxe8J3KG6"
                     //=============================================
-                    //var id = GoogleDriveClass.GetFileIdFromUrl(dData["url"]);
                     var urlForDownload = GoogleDriveClass.GetUrlForDownloadingData(dData["url"]);
 
-                    // test block
+                    // получаем имя файла 
                     var tmpResponse = GoogleDriveClass.GetInfo(urlForDownload.url, urlForDownload.httpClient);
                     string tmpFileName = tmpResponse.Content.Headers.ContentDisposition.FileNameStar;
-                    string tmpUrl = tmpResponse.RequestMessage.RequestUri.AbsoluteUri;
                     //
 
                     if (String.IsNullOrEmpty(dData["full_name"]))
@@ -169,7 +167,7 @@ namespace SDMCore
                     myContent.contentExtension = dData["extension"];
                     myContent.contentSize = 0;
 
-                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(tmpUrl, myContent.contentFullName);
+                    StandartFileDownloaderClass iw = new StandartFileDownloaderClass(urlForDownload.url, myContent.contentFullName);
                     iw.ProgressChanged += iw_ProgressChanged;
                     iw.FileCompleted += iw_FileCompleted;
                     iw.StartDownload(urlForDownload.httpClient);
